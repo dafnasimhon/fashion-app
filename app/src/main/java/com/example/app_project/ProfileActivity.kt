@@ -14,12 +14,16 @@ import com.example.app_project.models.AppConfig
 import com.example.app_project.repository.OutfitRepository
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * Activity that displays the user's profile information and their personal wardrobe uploads.
+ */
 class ProfileActivity : BaseActivity() {
 
     private lateinit var adapter: OutfitAdapter
     private val repository = OutfitRepository()
     private val db = FirebaseFirestore.getInstance()
 
+    // Launcher to handle gallery image selection for profile picture updates
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -30,6 +34,7 @@ class ProfileActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        // Highlight the profile tab in the bottom navigation
         setupBottomNavigation(R.id.btn_profile)
 
         setupRecyclerView()
@@ -38,6 +43,7 @@ class ProfileActivity : BaseActivity() {
 
         val ivProfile = findViewById<ImageView>(R.id.profile_IV_user)
         ivProfile.setOnClickListener {
+            // Trigger the gallery picker
             pickImageLauncher.launch("image/*")
         }
 
@@ -47,6 +53,9 @@ class ProfileActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Displays a confirmation dialog to prevent accidental logouts.
+     */
     private fun showLogoutDialog() {
         AlertDialog.Builder(this)
             .setTitle("Logout")
@@ -58,9 +67,13 @@ class ProfileActivity : BaseActivity() {
             .show()
     }
 
+    /**
+     * Terminates the Firebase session and clears the activity stack to return to Login.
+     */
     private fun performLogout() {
         auth.signOut()
         val intent = Intent(this, LoginActivity::class.java).apply {
+            // Flags to clear the task so the user cannot navigate back to the profile
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)
@@ -69,34 +82,46 @@ class ProfileActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Refresh the personal wardrobe feed whenever the user returns to this screen
         if (::adapter.isInitialized) {
             loadMyOutfits()
         }
     }
 
+    /**
+     * Uploads the selected profile image to Firebase Storage and updates the Firestore profile.
+     */
     private fun uploadImage(uri: Uri) {
         showToast("Updating profile image...")
         repository.uploadProfileImage(uri) { success, error ->
             if (success) {
                 showToast("Profile updated successfully!")
-                loadUserData()
+                loadUserData() // Refresh UI with the new image URL
             } else {
                 showToast("Failed to upload: $error")
             }
         }
     }
 
+    /**
+     * Configures a 3-column grid RecyclerView to display personal outfit posts.
+     */
     private fun setupRecyclerView() {
         adapter = OutfitAdapter(
             outfits = emptyList(),
-            showLikeButton = false
+            showLikeButton = false // Likes are hidden on the personal profile view
         ) { outfit ->
+            // Pass true to indicate we are navigating from the profile context
             navigateToDetail(outfit, true)
         }
 
+        // Standardized setup using the BaseActivity helper
         setupRecyclerView(R.id.profile_RV_my_outfits, 3, adapter)
     }
 
+    /**
+     * Fetches the user's display name and profile image URL from Firestore.
+     */
     private fun loadUserData() {
         val userId = auth.currentUser?.uid ?: return
         val tvName = findViewById<TextView>(R.id.profile_TV_username)
@@ -119,6 +144,9 @@ class ProfileActivity : BaseActivity() {
             }
     }
 
+    /**
+     * Loads the specific list of outfits uploaded by the current user.
+     */
     private fun loadMyOutfits() {
         repository.getMyOutfits { list, error ->
             if (list != null) {

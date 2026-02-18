@@ -18,6 +18,9 @@ class OutfitRepository {
 
     private val currentUserId: String? get() = auth.currentUser?.uid
 
+    /**
+     * Uploads outfit image to Storage first, then saves metadata to Firestore upon success.
+     */
     fun uploadOutfit(
         imageUri: Uri, top: String, bottom: String, jacket: String,
         shoes: String, jewelry: String, sunglasses: String, bag: String,
@@ -29,6 +32,7 @@ class OutfitRepository {
 
         val fileRef = storage.reference.child("${AppConfig.PATH_OUTFITS}/$outfitId.jpg")
 
+        // Multi-stage process: Upload file -> Get download URL -> Save to Firestore
         fileRef.putFile(imageUri).continueWithTask {
             fileRef.downloadUrl
         }.addOnSuccessListener { uri ->
@@ -56,6 +60,9 @@ class OutfitRepository {
             .addOnFailureListener { onResult(false, it.message) }
     }
 
+    /**
+     * Deletes both the Firestore document and the corresponding image from Storage.
+     */
     fun deleteOutfit(outfitId: String, imageUrl: String, onResult: (Boolean) -> Unit) {
         db.collection(AppConfig.COLL_OUTFITS).document(outfitId).delete()
             .addOnSuccessListener {
@@ -65,12 +72,15 @@ class OutfitRepository {
                         .addOnSuccessListener { onResult(true) }
                         .addOnFailureListener { onResult(false) }
                 } catch (e: Exception) {
-                    onResult(true)
+                    onResult(true) // Document deleted even if image deletion fails
                 }
             }
             .addOnFailureListener { onResult(false) }
     }
 
+    /**
+     * Retrieves all community outfits sorted by time, filtering out the current user's posts.
+     */
     fun getAllOutfits(onResult: (List<Outfit>?, String?) -> Unit) {
         db.collection(AppConfig.COLL_OUTFITS)
             .orderBy(AppConfig.FIELD_TIMESTAMP, Query.Direction.DESCENDING)
@@ -82,6 +92,9 @@ class OutfitRepository {
             }
     }
 
+    /**
+     * Fetches outfits uploaded specifically by the currently logged-in user.
+     */
     fun getMyOutfits(onResult: (List<Outfit>?, String?) -> Unit) {
         val userId = currentUserId ?: return onResult(null, "User not logged in")
 
@@ -96,6 +109,9 @@ class OutfitRepository {
             }
     }
 
+    /**
+     * Manages user favorites by adding/removing outfit IDs from a sub-collection.
+     */
     fun toggleLike(outfitId: String, isLiked: Boolean, onResult: (Boolean) -> Unit) {
         val userId = currentUserId ?: return onResult(false)
 
@@ -108,6 +124,9 @@ class OutfitRepository {
         task.addOnSuccessListener { onResult(true) }.addOnFailureListener { onResult(false) }
     }
 
+    /**
+     * First gets all favorite IDs, then fetches the full outfit objects using a 'whereIn' query.
+     */
     fun getFavoriteOutfits(onResult: (List<Outfit>?, String?) -> Unit) {
         val userId = currentUserId ?: return onResult(null, "User not logged in")
 
@@ -127,6 +146,9 @@ class OutfitRepository {
             }
     }
 
+    /**
+     * Checks if a specific outfit exists in the user's favorites collection.
+     */
     fun isOutfitLiked(outfitId: String, onResult: (Boolean) -> Unit) {
         val userId = currentUserId ?: return onResult(false)
         db.collection(AppConfig.COLL_USERS)
@@ -137,6 +159,9 @@ class OutfitRepository {
             .addOnFailureListener { onResult(false) }
     }
 
+    /**
+     * Uploads a profile picture and updates the user's document in Firestore with the URL.
+     */
     fun uploadProfileImage(imageUri: Uri, onResult: (Boolean, String?) -> Unit) {
         val userId = currentUserId ?: return onResult(false, "User not logged in")
         val fileRef = storage.reference.child("${AppConfig.PATH_PROFILES}/$userId.jpg")

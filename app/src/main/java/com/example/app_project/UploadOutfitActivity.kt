@@ -1,5 +1,6 @@
 package com.example.app_project
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -13,6 +14,9 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 
+/**
+ * Activity that handles the selection, tagging, and uploading of new outfits to Firebase.
+ */
 class UploadOutfitActivity : BaseActivity() {
 
     private lateinit var ivPreview: ImageView
@@ -31,6 +35,7 @@ class UploadOutfitActivity : BaseActivity() {
     private val outfitRepository = OutfitRepository()
     private var imageUri: Uri? = null
 
+    // Launcher to select an image from the device gallery and update the preview UI
     private val selectImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             imageUri = uri
@@ -44,10 +49,12 @@ class UploadOutfitActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upload_outfit)
 
+        // Set up the bottom navigation and highlight the 'Add' button
         setupBottomNavigation(R.id.btn_add_outfit)
         initViews()
         setupVibeDropdown()
 
+        // Trigger the gallery picker when clicking on the image container
         findViewById<MaterialCardView>(R.id.upload_CV_image_container).setOnClickListener {
             selectImageLauncher.launch("image/*")
         }
@@ -57,6 +64,9 @@ class UploadOutfitActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Links UI components from the XML layout to their respective variables.
+     */
     private fun initViews() {
         ivPreview = findViewById(R.id.upload_IV_preview)
         btnUpload = findViewById(R.id.upload_BTN_upload)
@@ -72,12 +82,18 @@ class UploadOutfitActivity : BaseActivity() {
         etBag = findViewById(R.id.upload_ET_bag)
     }
 
+    /**
+     * Populates the AutoCompleteTextView with predefined vibes from strings.xml resources.
+     */
     private fun setupVibeDropdown() {
         val vibes = resources.getStringArray(R.array.outfit_vibes)
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, vibes)
         actvVibe.setAdapter(adapter)
     }
 
+    /**
+     * Validates user input and proceeds with the multi-step Firebase upload process.
+     */
     private fun validateAndUpload() {
         val vibe = actvVibe.text.toString().trim()
         val top = etTop.text.toString().trim()
@@ -88,17 +104,19 @@ class UploadOutfitActivity : BaseActivity() {
         val sunglasses = etSunglasses.text.toString().trim()
         val bag = etBag.text.toString().trim()
 
+        // Ensure an image has been selected before proceeding
         if (imageUri == null) {
-            showToast("Please select an outfit image") // Using BaseActivity method
+            showToast("Please select an outfit image")
             return
         }
 
+        // Ensure a style vibe is selected
         if (vibe.isEmpty()) {
-            showToast(getString(R.string.msg_error_vibe)) // Localized error message
+            showToast(getString(R.string.msg_error_vibe))
             return
         }
 
-        // Basic form validation for core outfit components
+        // Basic validation for mandatory outfit components (e.g., Top and Bottom)
         if (top.isEmpty()) {
             etTop.error = "Top store is required"
             return
@@ -110,19 +128,23 @@ class UploadOutfitActivity : BaseActivity() {
 
         setLoading(true)
 
+        // Coordinate the upload through the Repository (Image to Storage -> Data to Firestore)
         outfitRepository.uploadOutfit(
             imageUri!!, top, bottom, jacket, shoes, jewelry, sunglasses, bag, vibe
         ) { success, error ->
             setLoading(false)
             if (success) {
                 showToast(getString(R.string.msg_upload_success))
-                finish()
+                finish() // Return to the previous screen upon success
             } else {
                 showToast("Upload failed: $error")
             }
         }
     }
 
+    /**
+     * Manages the UI state during active network requests to improve UX and prevent double submissions.
+     */
     private fun setLoading(isLoading: Boolean) {
         progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         btnUpload.isEnabled = !isLoading
