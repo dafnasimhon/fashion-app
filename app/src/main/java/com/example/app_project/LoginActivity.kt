@@ -2,23 +2,23 @@ package com.example.app_project
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.app_project.MainActivity
-import com.example.app_project.R
 import com.example.app_project.repository.AuthRepository
-import com.example.app_project.RegisterActivity
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var authRepository: AuthRepository
+    private val TAG = "StyleMate_Lifecycle" // תג לסינון ב-Logcat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        Log.d(TAG, "LoginActivity -> onCreate")
 
         authRepository = AuthRepository()
 
@@ -36,19 +36,39 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            Log.d(TAG, "LoginActivity: Attempting login for user: $email")
+
             authRepository.login(email, password) { success, error ->
                 if (success) {
-                    startActivity(Intent(this, MainActivity::class.java))
+                    Log.d(TAG, "LoginActivity: Login successful")
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
                     finish()
                 } else {
+                    Log.e(TAG, "LoginActivity: Login failed with error: $error")
                     Toast.makeText(this, "Login failed: $error", Toast.LENGTH_LONG).show()
                 }
             }
         }
 
         tvGoToRegister.setOnClickListener {
+            Log.d(TAG, "LoginActivity: Navigating to RegisterActivity")
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
     }
+
+    // --- Lifecycle Methods ---
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "LoginActivity -> onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "LoginActivity -> onResume")
+    }
+
+
 }

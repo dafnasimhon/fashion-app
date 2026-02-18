@@ -22,7 +22,6 @@ class OutfitDetailActivity : BaseActivity() {
         val ivImage = findViewById<ImageView>(R.id.detail_IV_image)
         val tvUsername = findViewById<TextView>(R.id.detail_TV_username)
         val btnDelete = findViewById<ImageButton>(R.id.detail_BTN_delete)
-
         val outfitId = intent.getStringExtra(AppConfig.EXTRA_OUTFIT_ID)
         val imageUrl = intent.getStringExtra(AppConfig.EXTRA_IMAGE_URL)
         val userId = intent.getStringExtra(AppConfig.EXTRA_USER_ID)

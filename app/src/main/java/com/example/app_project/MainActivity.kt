@@ -53,7 +53,6 @@ class MainActivity : BaseActivity() {
         }
 
         findViewById<Chip>(R.id.chip_all).setOnClickListener {
-            // שימוש בקבוע FILTER_ALL מה-Config
             filterOutfits(AppConfig.FILTER_ALL)
         }
     }
