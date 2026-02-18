@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">StyleMate</string>
+
+    <string-array name="outfit_vibes">
+        <item>Cafe</item>
+        <item>Party</item>
+        <item>Work</item>
+        <item>Gym</item>
+        <item>Restaurant</item>
+        <item>Wedding</item>
+        <item>City Trip</item>
+        <item>Beach</item>
+    </string-array>
+
+    <string name="label_vibe">VIBE</string>
+    <string name="label_top">TOP</string>
+    <string name="label_bottom">BOTTOM</string>
+    <string name="label_jacket">JACKET (Optional)</string>
+    <string name="label_shoes">SHOES (Optional)</string>
+    <string name="label_jewelry">JEWELRY (Optional)</string>
+    <string name="label_sunglasses">SUNGLASSES (Optional)</string>
+    <string name="label_bag">BAG (Optional)</string>
+
+    <string name="msg_upload_success">Outfit shared successfully!</string>
+    <string name="msg_error_vibe">Please select a vibe</string>
+</resources>
