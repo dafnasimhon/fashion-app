@@ -17,19 +17,29 @@ Profile: A personal hub displaying your uploaded collections, profile picture, a
 
 Outfit Details: An in-depth view of any outfit, showcasing metadata (Vibe, Accessories, etc.) and providing deletion options for owners.
 
-🚀 **Tech Stack**
+🚀 Technical Architecture & Stack
 
-Language: Kotlin.
+This project follows modern Android development standards, emphasizing clean code and scalability:
 
-Database: Firebase Firestore for real-time data storage.
+Language: 100% Kotlin.
 
-Storage: Firebase Storage for hosting high-quality outfit and profile images.
+BaseActivity Inheritance: Optimized code structure using a BaseActivity to handle shared logic such as Edge-to-Edge display, Navigation, and UI helpers (DRY principle).
 
-Authentication: Firebase Authentication for secure user sign-up, login, and session management.
+Dynamic UI Layouts: Extensive use of ConstraintLayout for responsive design and Material Design 3 components (MaterialCardView, ShapeableImageView).
 
-Image Loading: Glide for smooth and efficient image rendering.
+🛠 Advanced Features & Libraries
 
-Architecture: Repository Pattern to ensure clean, maintainable, and testable data handling.
+Firebase Ecosystem: * Firestore: Real-time NoSQL database for metadata and social sync.
+
+Storage: Cloud hosting for high-fidelity fashion imagery.
+
+Auth: Secure session management.
+
+Image Handling (Glide): Advanced image loading, caching, and transformations to ensure a smooth 60fps scrolling experience in the feed.
+
+Animations (Lottie): Integration of vector-based animations for an interactive and high-quality UX during loading states.
+
+IME & Keyboard Handling: Implementation of WindowInsetsCompat to ensure the UI adjusts gracefully when the keyboard is active, preventing layout clipping.
 
 📸 **UI Design**
 
