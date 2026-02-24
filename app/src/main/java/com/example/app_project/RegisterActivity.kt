@@ -3,18 +3,17 @@ package com.example.app_project
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.airbnb.lottie.LottieAnimationView
 import com.example.app_project.repository.AuthRepository
 import com.example.app_project.repository.OutfitRepository
 
@@ -23,14 +22,13 @@ import com.example.app_project.repository.OutfitRepository
  */
 class RegisterActivity : AppCompatActivity() {
 
+    // שימוש ב-Singletons עבור ה-Repositories כפי שהגדרנו בעבר
     private val authRepository = AuthRepository
     private val outfitRepository = OutfitRepository
 
     private var profileImageUri: Uri? = null
     private lateinit var ivProfile: ImageView
-    private lateinit var progressBar: ProgressBar
-
-    private val TAG = "StyleMate_Lifecycle"
+    private lateinit var animationView: LottieAnimationView // הוחלף מ-ProgressBar
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -45,6 +43,8 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        // ניהול ה-Padding למניעת חסימה על ידי המקלדת
         val scrollView = findViewById<View>(R.id.register_scroll_view)
         ViewCompat.setOnApplyWindowInsetsListener(scrollView) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -56,7 +56,8 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         ivProfile = findViewById(R.id.register_IV_profile)
-        progressBar = findViewById(R.id.register_PB_loading)
+        // אתחול האנימציה לפי ה-ID החדש מה-XML המעודכן
+        animationView = findViewById(R.id.register_animation)
 
         val etFullName = findViewById<EditText>(R.id.et_username)
         val etEmail = findViewById<EditText>(R.id.et_email)
@@ -123,9 +124,23 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
+    /**
+     * ניהול מצב הטעינה באמצעות ה-Lottie Animation החדש
+     */
     private fun setLoading(isLoading: Boolean) {
-        progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-        findViewById<Button>(R.id.btn_register).isEnabled = !isLoading
+        val btnRegister = findViewById<Button>(R.id.btn_register)
+
+        if (isLoading) {
+            animationView.visibility = View.VISIBLE
+            animationView.playAnimation() // הפעלת האנימציה בזמן הרישום
+            btnRegister.isEnabled = false
+            btnRegister.alpha = 0.5f
+        } else {
+            animationView.visibility = View.GONE
+            animationView.pauseAnimation()
+            btnRegister.isEnabled = true
+            btnRegister.alpha = 1.0f
+        }
     }
 
     private fun showToast(message: String) {

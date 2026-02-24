@@ -83,7 +83,6 @@
                 android:layout_marginTop="24dp"
                 android:hint="Vibe"
                 app:layout_constraintTop_toBottomOf="@id/upload_CV_image_container">
-
                 <AutoCompleteTextView
                     android:id="@+id/upload_ACTV_vibe"
                     android:layout_width="match_parent"
@@ -210,17 +209,21 @@
                 app:backgroundTint="#000000"
                 app:cornerRadius="30dp"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_bag"
-                app:layout_constraintBottom_toTopOf="@id/upload_PB_loading"/>
+                app:layout_constraintBottom_toTopOf="@id/upload_animation"/>
 
-            <ProgressBar
-                android:id="@+id/upload_PB_loading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/upload_animation"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
                 android:layout_marginBottom="32dp"
+                android:visibility="gone"
+                app:lottie_rawRes="@raw/loading_fashion"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/upload_BTN_upload" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
