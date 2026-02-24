@@ -22,14 +22,12 @@ import com.example.app_project.repository.OutfitRepository
  */
 class RegisterActivity : AppCompatActivity() {
 
-    // שימוש ב-Singletons עבור ה-Repositories כפי שהגדרנו בעבר
     private val authRepository = AuthRepository
     private val outfitRepository = OutfitRepository
 
     private var profileImageUri: Uri? = null
     private lateinit var ivProfile: ImageView
-    private lateinit var animationView: LottieAnimationView // הוחלף מ-ProgressBar
-
+    private lateinit var animationView: LottieAnimationView
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -44,7 +42,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // ניהול ה-Padding למניעת חסימה על ידי המקלדת
         val scrollView = findViewById<View>(R.id.register_scroll_view)
         ViewCompat.setOnApplyWindowInsetsListener(scrollView) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -56,7 +53,6 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         ivProfile = findViewById(R.id.register_IV_profile)
-        // אתחול האנימציה לפי ה-ID החדש מה-XML המעודכן
         animationView = findViewById(R.id.register_animation)
 
         val etFullName = findViewById<EditText>(R.id.et_username)
@@ -124,15 +120,12 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
-    /**
-     * ניהול מצב הטעינה באמצעות ה-Lottie Animation החדש
-     */
     private fun setLoading(isLoading: Boolean) {
         val btnRegister = findViewById<Button>(R.id.btn_register)
 
         if (isLoading) {
             animationView.visibility = View.VISIBLE
-            animationView.playAnimation() // הפעלת האנימציה בזמן הרישום
+            animationView.playAnimation()
             btnRegister.isEnabled = false
             btnRegister.alpha = 0.5f
         } else {

@@ -20,7 +20,7 @@ class UploadOutfitActivity : BaseActivity() {
 
     private lateinit var ivPreview: ImageView
     private lateinit var btnUpload: MaterialButton
-    private lateinit var animationView: LottieAnimationView // הוחלף מ-ProgressBar כדי להתאים ל-Lottie
+    private lateinit var animationView: LottieAnimationView
     private lateinit var actvVibe: AutoCompleteTextView
 
     private lateinit var etTop: TextInputEditText
@@ -31,11 +31,9 @@ class UploadOutfitActivity : BaseActivity() {
     private lateinit var etSunglasses: TextInputEditText
     private lateinit var etBag: TextInputEditText
 
-    // שימוש ב-Singleton: פנייה ישירה לאובייקט ה-Repository
     private val outfitRepository = OutfitRepository
     private var imageUri: Uri? = null
 
-    // Launcher לבחירת תמונה מהגלריה
     private val selectImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             imageUri = it
@@ -49,16 +47,13 @@ class UploadOutfitActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upload_outfit)
 
-        // פתרון בעיית המקלדת וה-Insets דרך ה-BaseActivity
         applyEdgeToEdge(findViewById(R.id.main))
 
-        // סימון כפתור ה"הוספה" בתפריט הניווט התחתון
         setupBottomNavigation(R.id.btn_add_outfit)
 
         initViews()
         setupVibeDropdown()
 
-        // פתיחת הגלריה בלחיצה על אזור התמונה
         findViewById<MaterialCardView>(R.id.upload_CV_image_container).setOnClickListener {
             selectImageLauncher.launch("image/*")
         }
@@ -71,7 +66,6 @@ class UploadOutfitActivity : BaseActivity() {
     private fun initViews() {
         ivPreview = findViewById(R.id.upload_IV_preview)
         btnUpload = findViewById(R.id.upload_BTN_upload)
-        // אתחול האנימציה לפי ה-ID החדש שהגדרנו ב-XML
         animationView = findViewById(R.id.upload_animation)
         actvVibe = findViewById(R.id.upload_ACTV_vibe)
 
@@ -117,7 +111,6 @@ class UploadOutfitActivity : BaseActivity() {
 
         setLoading(true)
 
-        // העלאת האאוטפיט דרך ה-Singleton Repository
         outfitRepository.uploadOutfit(
             imageUri!!, top, bottom, jacket, shoes, jewelry, sunglasses, bag, vibe
         ) { success, error ->
@@ -131,9 +124,6 @@ class UploadOutfitActivity : BaseActivity() {
         }
     }
 
-    /**
-     * ניהול מצב הטעינה באמצעות האנימציה של הבחורה עם השקיות
-     */
     private fun setLoading(isLoading: Boolean) {
         if (isLoading) {
             animationView.visibility = View.VISIBLE
