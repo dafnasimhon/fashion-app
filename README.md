@@ -17,7 +17,7 @@ Profile: A personal hub displaying your uploaded collections, profile picture, a
 
 Outfit Details: An in-depth view of any outfit, showcasing metadata (Vibe, Accessories, etc.) and providing deletion options for owners.
 
-🚀 Technical Architecture & Stack
+**🚀 Technical Architecture & Stack**
 
 This project follows modern Android development standards, emphasizing clean code and scalability:
 
