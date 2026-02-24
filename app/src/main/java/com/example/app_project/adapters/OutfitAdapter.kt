@@ -10,7 +10,14 @@ import com.bumptech.glide.Glide
 import com.example.app_project.R
 import com.example.app_project.models.Outfit
 import com.example.app_project.repository.OutfitRepository
-
+/**
+ * A custom [RecyclerView.Adapter] responsible for managing and displaying the Outfit feed.
+ * * Key Features:
+ * - Efficient image rendering and caching using the **Glide** library.
+ * - Reactive "Like" functionality integrated with the **OutfitRepository**.
+ * - Support for conditional UI elements (like/unlike buttons) based on context.
+ * - Decoupled click handling via a higher-order function.
+ */
 class OutfitAdapter(
     private var outfits: List<Outfit>,
     private val showLikeButton: Boolean = true,
