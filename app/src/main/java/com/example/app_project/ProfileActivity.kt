@@ -3,6 +3,7 @@ package com.example.app_project
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -20,21 +21,27 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ProfileActivity : BaseActivity() {
 
     private lateinit var adapter: OutfitAdapter
-    private val repository = OutfitRepository()
+
+    private val repository = OutfitRepository
     private val db = FirebaseFirestore.getInstance()
+    private val TAG = "StyleMate_Profile"
 
     // Launcher to handle gallery image selection for profile picture updates
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { uploadImage(it) }
+        uri?.let {
+            Log.d(TAG, "Image selected: $it")
+            uploadImage(it)
+        } ?: Log.w(TAG, "No image selected")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        // Highlight the profile tab in the bottom navigation
+        applyEdgeToEdge(findViewById(R.id.main))
+
         setupBottomNavigation(R.id.btn_profile)
 
         setupRecyclerView()
@@ -43,7 +50,6 @@ class ProfileActivity : BaseActivity() {
 
         val ivProfile = findViewById<ImageView>(R.id.profile_IV_user)
         ivProfile.setOnClickListener {
-            // Trigger the gallery picker
             pickImageLauncher.launch("image/*")
         }
 
@@ -54,7 +60,7 @@ class ProfileActivity : BaseActivity() {
     }
 
     /**
-     * Displays a confirmation dialog to prevent accidental logouts.
+     * Displays a confirmation dialog before calling the centralized logout.
      */
     private fun showLogoutDialog() {
         AlertDialog.Builder(this)
@@ -67,61 +73,41 @@ class ProfileActivity : BaseActivity() {
             .show()
     }
 
-    /**
-     * Terminates the Firebase session and clears the activity stack to return to Login.
-     */
-    private fun performLogout() {
-        auth.signOut()
-        val intent = Intent(this, LoginActivity::class.java).apply {
-            // Flags to clear the task so the user cannot navigate back to the profile
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        startActivity(intent)
-        finish()
-    }
 
     override fun onResume() {
         super.onResume()
-        // Refresh the personal wardrobe feed whenever the user returns to this screen
         if (::adapter.isInitialized) {
             loadMyOutfits()
         }
     }
 
     /**
-     * Uploads the selected profile image to Firebase Storage and updates the Firestore profile.
+     * Uploads the selected profile image using the Repository Singleton.
      */
     private fun uploadImage(uri: Uri) {
         showToast("Updating profile image...")
         repository.uploadProfileImage(uri) { success, error ->
             if (success) {
                 showToast("Profile updated successfully!")
-                loadUserData() // Refresh UI with the new image URL
+                loadUserData()
             } else {
+                Log.e(TAG, "Upload failed: $error")
                 showToast("Failed to upload: $error")
             }
         }
     }
 
-    /**
-     * Configures a 3-column grid RecyclerView to display personal outfit posts.
-     */
     private fun setupRecyclerView() {
         adapter = OutfitAdapter(
             outfits = emptyList(),
-            showLikeButton = false // Likes are hidden on the personal profile view
+            showLikeButton = false
         ) { outfit ->
-            // Pass true to indicate we are navigating from the profile context
             navigateToDetail(outfit, true)
         }
 
-        // Standardized setup using the BaseActivity helper
         setupRecyclerView(R.id.profile_RV_my_outfits, 3, adapter)
     }
 
-    /**
-     * Fetches the user's display name and profile image URL from Firestore.
-     */
     private fun loadUserData() {
         val userId = auth.currentUser?.uid ?: return
         val tvName = findViewById<TextView>(R.id.profile_TV_username)
@@ -142,18 +128,24 @@ class ProfileActivity : BaseActivity() {
                     }
                 }
             }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error loading user data: ${e.message}")
+            }
     }
 
-    /**
-     * Loads the specific list of outfits uploaded by the current user.
-     */
     private fun loadMyOutfits() {
         repository.getMyOutfits { list, error ->
             if (list != null) {
                 adapter.updateData(list)
             } else {
+                Log.e(TAG, "Error loading outfits: $error")
                 showToast("Error: $error")
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        repository.clearListeners()
     }
 }

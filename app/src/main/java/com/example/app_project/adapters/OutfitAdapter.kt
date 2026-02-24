@@ -17,7 +17,7 @@ class OutfitAdapter(
     private val onItemClick: (Outfit) -> Unit
 ) : RecyclerView.Adapter<OutfitAdapter.OutfitViewHolder>() {
 
-    private val repository = OutfitRepository()
+    private val repository = OutfitRepository
 
     class OutfitViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivImage: ImageView = view.findViewById(R.id.outfitImage)
@@ -33,7 +33,6 @@ class OutfitAdapter(
     override fun onBindViewHolder(holder: OutfitViewHolder, position: Int) {
         val outfit = outfits[position]
 
-        // Load outfit image efficiently with Glide and show placeholder until loading finishes
         Glide.with(holder.itemView.context)
             .load(outfit.imageUrl)
             .centerCrop()
@@ -43,11 +42,9 @@ class OutfitAdapter(
         if (showLikeButton) {
             holder.btnLike.visibility = View.VISIBLE
 
-            // Reset like button state before verifying with the database
             holder.btnLike.setImageResource(R.drawable.ic_heart_tool_bar)
             holder.btnLike.tag = false
 
-            // Asynchronously check if the current user has liked this outfit
             repository.isOutfitLiked(outfit.id) { isLiked ->
                 if (isLiked) {
                     holder.btnLike.setImageResource(R.drawable.ic_heart_filled)
@@ -55,7 +52,6 @@ class OutfitAdapter(
                 }
             }
 
-            // Handle like/unlike logic: update database and reflect status in UI
             holder.btnLike.setOnClickListener {
                 val currentStatus = holder.btnLike.tag as? Boolean ?: false
                 val newStatus = !currentStatus
@@ -74,7 +70,6 @@ class OutfitAdapter(
             holder.btnLike.visibility = View.GONE
         }
 
-        // Navigate to outfit details on item click
         holder.itemView.setOnClickListener {
             onItemClick(outfit)
         }
@@ -82,7 +77,6 @@ class OutfitAdapter(
 
     override fun getItemCount(): Int = outfits.size
 
-    // Update the outfit list and refresh UI (e.g., after filtering by vibe)
     fun updateData(newOutfits: List<Outfit>) {
         this.outfits = newOutfits
         notifyDataSetChanged()

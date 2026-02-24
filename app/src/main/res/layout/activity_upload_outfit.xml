@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
@@ -80,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="@string/label_vibe"
+                android:hint="Vibe"
                 app:layout_constraintTop_toBottomOf="@id/upload_CV_image_container">
 
                 <AutoCompleteTextView
@@ -96,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="@string/label_top"
+                android:hint="Top"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_vibe">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_top"
@@ -111,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/label_bottom"
+                android:hint="Bottom"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_top">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_bottom"
@@ -126,7 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/label_jacket"
+                android:hint="Jacket"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_bottom">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_jacket"
@@ -141,7 +142,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/label_shoes"
+                android:hint="Shoes"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_jacket">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_shoes"
@@ -156,7 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/label_jewelry"
+                android:hint="Jewelry"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_shoes">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_jewelry"
@@ -171,7 +172,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/label_sunglasses"
+                android:hint="Sunglasses"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_jewelry">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_sunglasses"
@@ -186,7 +187,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="@string/label_bag"
+                android:hint="Bag"
                 app:layout_constraintTop_toBottomOf="@id/upload_TIL_sunglasses">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/upload_ET_bag"

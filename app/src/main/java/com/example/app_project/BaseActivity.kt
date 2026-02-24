@@ -2,14 +2,19 @@ package com.example.app_project
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.app_project.adapters.OutfitAdapter
 import com.example.app_project.models.AppConfig
 import com.example.app_project.models.Outfit
+import com.example.app_project.repository.OutfitRepository
 import com.google.firebase.auth.FirebaseAuth
 
 /**
@@ -18,22 +23,41 @@ import com.google.firebase.auth.FirebaseAuth
 open class BaseActivity : AppCompatActivity() {
 
     protected val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val BASE_TAG = "StyleMate_Base"
 
     override fun onStart() {
         super.onStart()
-        // Ensure user is authenticated as soon as the activity becomes visible
         checkUserStatus()
     }
 
     override fun onResume() {
         super.onResume()
-        // Re-verify auth status if the user returns to the app
         checkUserStatus()
     }
 
-    /**
-     * Helper to initialize a RecyclerView with a specific grid layout.
-     */
+    fun performLogout() {
+        Log.d(BASE_TAG, "Starting centralized logout process")
+        OutfitRepository.clearListeners()
+
+        auth.signOut()
+
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
+    }
+
+    protected fun applyEdgeToEdge(rootView: View?) {
+        rootView?.let { view ->
+            ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
+        }
+    }
+
     protected fun setupRecyclerView(rvId: Int, spanCount: Int, adapter: OutfitAdapter): RecyclerView {
         val rv = findViewById<RecyclerView>(rvId)
         rv.layoutManager = GridLayoutManager(this, spanCount)
@@ -45,9 +69,6 @@ open class BaseActivity : AppCompatActivity() {
         Toast.makeText(this, message ?: "An error occurred", Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * Redirects unauthenticated users to the Login screen if the current page requires auth.
-     */
     private fun checkUserStatus() {
         if (auth.currentUser == null && isAuthRequired()) {
             val intent = Intent(this, LoginActivity::class.java)
@@ -57,18 +78,12 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Excludes Login and Register screens from the automatic authentication check.
-     */
     private fun isAuthRequired(): Boolean {
         val currentClass = this::class.java.simpleName
         return currentClass != LoginActivity::class.java.simpleName &&
                 currentClass != RegisterActivity::class.java.simpleName
     }
 
-    /**
-     * Sets up the bottom navigation bar and highlights the active screen.
-     */
     protected fun setupBottomNavigation(activeButtonId: Int) {
         val btnHome = findViewById<ImageButton>(R.id.btn_home)
         val btnAdd = findViewById<ImageButton>(R.id.btn_add_outfit)
@@ -93,9 +108,6 @@ open class BaseActivity : AppCompatActivity() {
         btnProfile?.setOnClickListener { navigateTo(ProfileActivity::class.java) }
     }
 
-    /**
-     * Passes all outfit metadata via Intent to the Detail screen.
-     */
     protected fun navigateToDetail(outfit: Outfit, isFromProfile: Boolean = false) {
         val intent = Intent(this, OutfitDetailActivity::class.java).apply {
             putExtra(AppConfig.EXTRA_OUTFIT_ID, outfit.id)
@@ -114,9 +126,6 @@ open class BaseActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    /**
-     * Standard navigation helper to avoid re-opening the same activity.
-     */
     private fun navigateTo(destination: Class<*>) {
         if (this.javaClass != destination) {
             val intent = Intent(this, destination)

@@ -1,6 +1,7 @@
 package com.example.app_project
 
 import android.os.Bundle
+import android.util.Log
 import com.example.app_project.adapters.OutfitAdapter
 import com.example.app_project.repository.OutfitRepository
 
@@ -10,11 +11,15 @@ import com.example.app_project.repository.OutfitRepository
 class FavoritesActivity : BaseActivity() {
 
     private lateinit var adapter: OutfitAdapter
-    private val outfitRepository = OutfitRepository()
+
+    private val outfitRepository = OutfitRepository
+    private val TAG = "StyleMate_Favorites"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
+
+        applyEdgeToEdge(findViewById(R.id.main))
 
         // Highlight the favorites icon in the bottom navigation bar
         setupBottomNavigation(R.id.btn_favorites)
@@ -25,42 +30,37 @@ class FavoritesActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh the list whenever the user returns to this screen to ensure data accuracy
         if (::adapter.isInitialized) {
             loadFavoriteOutfits()
         }
     }
 
-    /**
-     * Initializes the RecyclerView with a 2-column grid and defines the click behavior.
-     */
     private fun setupRecyclerView() {
         adapter = OutfitAdapter(
             outfits = emptyList(),
             showLikeButton = true
         ) { outfit ->
-            // Navigate to the detail view when an outfit is clicked
             navigateToDetail(outfit)
         }
-        // Utilizes the helper method from BaseActivity for standardized setup
         setupRecyclerView(R.id.fav_RV_list, 2, adapter)
     }
 
-    /**
-     * Fetches favorited outfits from the repository and updates the UI accordingly.
-     */
     private fun loadFavoriteOutfits() {
         outfitRepository.getFavoriteOutfits { list, error ->
             if (list != null) {
-                // Update the adapter with the fetched list of favorites
                 adapter.updateData(list)
-
                 if (list.isEmpty()) {
                     showToast("Your wishlist is empty!")
                 }
             } else {
+                Log.e(TAG, "Error loading favorites: $error")
                 showToast("Error: $error")
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        outfitRepository.clearListeners()
     }
 }

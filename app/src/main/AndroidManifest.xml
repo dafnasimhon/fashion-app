@@ -17,6 +17,7 @@
 
         <activity
             android:name=".LoginActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,21 +27,29 @@
 
         <activity
             android:name=".RegisterActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
         <activity
             android:name=".UploadOutfitActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
+
         <activity
             android:name=".OutfitDetailActivity"
             android:exported="false" />
+
         <activity
             android:name=".BaseActivity"
             android:exported="false" />
+
         <activity android:name=".FavoritesActivity" />
+
         <activity android:name=".ProfileActivity" />
+
     </application>
 </manifest>

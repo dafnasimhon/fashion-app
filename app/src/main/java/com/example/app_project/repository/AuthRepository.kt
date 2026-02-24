@@ -5,7 +5,10 @@ import com.example.app_project.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AuthRepository {
+/**
+ * Repository object (Singleton) for handling all authentication-related tasks.
+ */
+object AuthRepository {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -19,8 +22,6 @@ class AuthRepository {
                 if (task.isSuccessful) {
                     val uid = auth.currentUser?.uid ?: ""
                     val user = User(uid = uid, fullName = fullName, email = email)
-
-                    // Proceed to save user profile data in Firestore after successful authentication
                     saveUserToFirestore(user, onResult)
                 } else {
                     onResult(false, task.exception?.message)
@@ -28,9 +29,6 @@ class AuthRepository {
             }
     }
 
-    /**
-     * Saves additional user information (like full name) to the 'users' collection in Firestore.
-     */
     private fun saveUserToFirestore(user: User, onResult: (Boolean, String?) -> Unit) {
         db.collection(AppConfig.COLL_USERS).document(user.uid)
             .set(user)
@@ -42,9 +40,6 @@ class AuthRepository {
             }
     }
 
-    /**
-     * Authenticates an existing user with email and password.
-     */
     fun login(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -56,14 +51,8 @@ class AuthRepository {
             }
     }
 
-    /**
-     * Checks if a user session is currently active.
-     */
     fun isUserLoggedIn(): Boolean = auth.currentUser != null
 
-    /**
-     * Ends the current user session.
-     */
     fun logout() {
         auth.signOut()
     }
