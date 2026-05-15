@@ -1,5 +1,7 @@
 package com.example.app_project.models
-
+/**
+ * AppConfig serves as the centralized configuration hub for the entire application
+ */
 object AppConfig {
     const val COLL_USERS = "users"
     const val COLL_OUTFITS = "outfits"

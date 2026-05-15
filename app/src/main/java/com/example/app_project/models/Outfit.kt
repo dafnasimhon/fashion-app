@@ -1,5 +1,7 @@
 package com.example.app_project.models
-
+/**
+ * Data model representing a single Outfit entity within the application.
+ */
 data class Outfit(
     val id: String = "",
     val userId: String = "",

@@ -127,12 +127,12 @@ class UploadOutfitActivity : BaseActivity() {
     private fun setLoading(isLoading: Boolean) {
         if (isLoading) {
             animationView.visibility = View.VISIBLE
-            animationView.playAnimation() // התחלת האנימציה
+            animationView.playAnimation()
             btnUpload.isEnabled = false
             btnUpload.alpha = 0.5f
         } else {
             animationView.visibility = View.GONE
-            animationView.pauseAnimation() // עצירת האנימציה
+            animationView.pauseAnimation()
             btnUpload.isEnabled = true
             btnUpload.alpha = 1.0f
         }
